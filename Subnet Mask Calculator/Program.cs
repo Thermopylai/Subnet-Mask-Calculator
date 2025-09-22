@@ -11,16 +11,26 @@
                 Console.Clear();
                 Console.WriteLine("Subnet Mask and Network Address Calculator");
                 Console.WriteLine("----------------------");
-                Console.Write("Enter an IP address (e.g. 192.168.1.1): ");
+
+                Console.WriteLine("Enter an IP address (e.g. 192.168.1.1): ");
                 string ipAddress = Console.ReadLine();
-                Console.Write("Enter the prefix length (e.g. 24): ");
+                var segments = ipAddress.Split('.');
+                while (ipAddress == string.Empty || segments.Length != 4)
+                {
+                    Console.WriteLine("\nPlease enter 4 numbers (0-255) separated with a dot.");
+                    ipAddress = Console.ReadLine();
+                    segments = ipAddress.Split('.');
+                }
+                
+                Console.WriteLine("\nEnter the prefix length (e.g. 24): ");
                 int prefixLength;
                 while (!int.TryParse(Console.ReadLine(), out prefixLength) || prefixLength < 0 || prefixLength > 32)
                 {
-                    Console.Write("Invalid input. Please enter a valid prefix length (0-32): ");
-                }       
-                IPAddress ip = new IPAddress(ipAddress, prefixLength);
-                ip.Display();
+                    Console.WriteLine("\nInvalid input. Please enter a valid prefix length (0-32): ");
+                }
+                
+                IPAddress ip = new IPAddress(segments, prefixLength);
+
                 Console.WriteLine("\nWould you like to calculate another subnet mask and network address? (y/n): ");
                 string response = Console.ReadLine().ToLower();
                 if (response != "y")
@@ -39,16 +49,14 @@
         public int prefixLength { get; set; }
         
 
-        public IPAddress(string ipAddress, int prefixLength)
+        public IPAddress(string[] segments, int prefixLength)
         {
-            var segments = ipAddress.Split('.');
-            if (segments.Length != 4)
-                throw new ArgumentException("Invalid IP address format.");
             ip1 = byte.Parse(segments[0]);
             ip2 = byte.Parse(segments[1]);
             ip3 = byte.Parse(segments[2]);
             ip4 = byte.Parse(segments[3]);
             this.prefixLength = prefixLength;
+            Display();
         }
 
         public void Display()
@@ -64,8 +72,6 @@
 
         public static string CalculateSubnetMask(int prefixLength)
         {
-            if (prefixLength < 0 || prefixLength > 32)
-                throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length must be between 0 and 32.");
             uint mask = uint.MaxValue << (32 - prefixLength); 
                 // MaxValue equals 4 294 967 295 in decimal, it's 32 bits of 1s.
                 // (32 - prefixLength) equals the number of 0s to add at the end,
@@ -86,8 +92,6 @@
         
         public string NetworkAddress(int prefixLength)
         {
-            if (prefixLength < 0 || prefixLength > 32)
-                throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length must be between 0 and 32.");
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4); 
                 // Combine the four 8 bit bytes into a single 32 bit uint value by shifting and ORing.
                 // Shifting will preserve the leading bits of the 8 bit bytes
@@ -106,8 +110,6 @@
         }
         public string firstUsableAddress(int prefixLength)
         {
-            if (prefixLength < 0 || prefixLength > 32)
-                throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length must be between 0 and 32.");
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4);
             uint mask = uint.MaxValue << (32 - prefixLength);
             uint network = ip & mask;
@@ -121,8 +123,6 @@
         }
         public string lastUsableAddress(int prefixLength)
         {
-            if (prefixLength < 0 || prefixLength > 32)
-                throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length must be between 0 and 32.");
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4);
             uint mask = uint.MaxValue << (32 - prefixLength);
             uint network = ip & mask;
@@ -142,8 +142,6 @@
         }
         public string broadcastAddress(int prefixLength)
         {
-            if (prefixLength < 0 || prefixLength > 32)
-                throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length must be between 0 and 32.");
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4);
             uint mask = uint.MaxValue << (32 - prefixLength);
             uint network = ip & mask;
@@ -156,8 +154,6 @@
         }
         public static int totalHosts(int prefixLength)
         {
-            if (prefixLength < 0 || prefixLength > 32)
-                throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length must be between 0 and 32.");
             return (int)(Math.Pow(2, 32 - prefixLength) - 2);
                 // Total usable hosts equals 2^(32 - prefixLength) - 2.
                 // The subtraction of 2 accounts for the network and broadcast addresses,
