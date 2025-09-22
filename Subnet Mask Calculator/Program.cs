@@ -42,11 +42,11 @@
     }
     public class IPAddress
     {
-        public byte ip1 { get; set; }   
-        public byte ip2 { get; set; }       
-        public byte ip3 { get; set; }   
-        public byte ip4 { get; set; }
-        public int prefixLength { get; set; }
+        private byte ip1;
+        private byte ip2;       
+        private byte ip3;   
+        private byte ip4;
+        private int prefixLength;
         
 
         public IPAddress(string[] segments, int prefixLength)
@@ -59,7 +59,7 @@
             Display();
         }
 
-        public void Display()
+        private void Display()
         {
             Console.WriteLine($"\nIP Address: {ip1}.{ip2}.{ip3}.{ip4}/{prefixLength}");
             Console.WriteLine($"Subnet Mask: {CalculateSubnetMask(prefixLength)}");
@@ -70,7 +70,7 @@
             Console.WriteLine($"Total Usable Hosts: {totalHosts(prefixLength)}");
         }   
 
-        public static string CalculateSubnetMask(int prefixLength)
+        private string CalculateSubnetMask(int prefixLength)
         {
             uint mask = uint.MaxValue << (32 - prefixLength); 
                 // MaxValue equals 4 294 967 295 in decimal, it's 32 bits of 1s.
@@ -90,7 +90,7 @@
                 // Just turn all 24 leading bits of mask to zero.
         }
         
-        public string NetworkAddress(int prefixLength)
+        private string NetworkAddress(int prefixLength)
         {
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4); 
                 // Combine the four 8 bit bytes into a single 32 bit uint value by shifting and ORing.
@@ -108,7 +108,7 @@
                 (network >> 8) & 0xFF,
                 network & 0xFF);
         }
-        public string firstUsableAddress(int prefixLength)
+        private string firstUsableAddress(int prefixLength)
         {
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4);
             uint mask = uint.MaxValue << (32 - prefixLength);
@@ -121,7 +121,7 @@
                 (firstUsable >> 8) & 0xFF,
                 firstUsable & 0xFF);
         }
-        public string lastUsableAddress(int prefixLength)
+        private string lastUsableAddress(int prefixLength)
         {
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4);
             uint mask = uint.MaxValue << (32 - prefixLength);
@@ -140,7 +140,7 @@
                 (lastUsable >> 8) & 0xFF,
                 lastUsable & 0xFF);
         }
-        public string broadcastAddress(int prefixLength)
+        private string broadcastAddress(int prefixLength)
         {
             uint ip = (uint)(ip1 << 24 | ip2 << 16 | ip3 << 8 | ip4);
             uint mask = uint.MaxValue << (32 - prefixLength);
@@ -152,7 +152,7 @@
                 (broadcast >> 8) & 0xFF,
                 broadcast & 0xFF);
         }
-        public static int totalHosts(int prefixLength)
+        private int totalHosts(int prefixLength)
         {
             return (int)(Math.Pow(2, 32 - prefixLength) - 2);
                 // Total usable hosts equals 2^(32 - prefixLength) - 2.
