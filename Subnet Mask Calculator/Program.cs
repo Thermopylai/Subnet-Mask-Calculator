@@ -14,12 +14,12 @@ namespace Subnet_Mask_Calculator
                 Console.WriteLine("----------------------");
 
                 Console.WriteLine("Enter an IP address (e.g. 192.168.1.1): ");
-                string ipAddress = Console.ReadLine();
+                string ipAddress = Console.ReadLine() ?? "";
                 Regex regex = new Regex(@"^(([01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([01]?\d{1,2}|2[0-4]\d|25[0-5]){1}$");
                 while(!regex.IsMatch(ipAddress))
                 {
                     Console.WriteLine("\nPlease enter 4 numbers (0-255) separated with a dot.");
-                    ipAddress = Console.ReadLine();
+                    ipAddress = Console.ReadLine() ?? "";
                 } 
                 var segments = ipAddress.Split('.');
                 Console.WriteLine("\nEnter the prefix length (e.g. 24): ");
